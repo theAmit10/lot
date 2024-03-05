@@ -3,6 +3,8 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+import { Wallet } from "./walletone.js";
+
 const schema = new mongoose.Schema({
   name: {
     type: String,
@@ -20,11 +22,18 @@ const schema = new mongoose.Schema({
     minLength: [6, "Password must be atleast 6 characters long"],
     select: false,
   },
+  walletOne: { type: mongoose.Schema.Types.ObjectId, ref: 'Wallet' },
+  walletTwo: { type: mongoose.Schema.Types.ObjectId, ref: 'Wallet' },
   role: {
     type: String,
     enum: ["admin", "user"],
     default: "user",
   },
+  loginType: {
+    type: String,
+    enum: ['Google', 'manual'],
+    default: 'manual'
+},
   avatar: {
     public_id: String,
     url: String,
@@ -33,15 +42,50 @@ const schema = new mongoose.Schema({
   otp_expire: Date,
 });
 
+
+
 // Before Saving the USER Run Below funcation
 // We are encrypting user password before saving it in database
 
 // Here scheme is a object so we can get it value by using this keyword
+// schema.pre("save", async function (next) {
+// //   console.log(this.password);
+//   if (!this.isModified("password")) next();
+//   this.password = await bcrypt.hash(this.password, 10);
+// });
+
 schema.pre("save", async function (next) {
-//   console.log(this.password);
-  if (!this.isModified("password")) next();
+  if (!this.isNew || !this.isModified("password")) {
+    // If the document is not new or password is not modified, skip wallet creation
+    next();
+    return;
+  }
+
+  try {
+    const walletOne = await Wallet.create({
+        userId: this._id,
+        walletName: 'Wallet One',
+        visibility: true
+    });
+
+    const walletTwo = await Wallet.create({
+        userId: this._id,
+        walletName: 'Wallet Two',
+        visibility: true
+    });
+
+    this.walletOne = walletOne._id;
+    this.walletTwo = walletTwo._id;
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+
+  // Encrypt the password before saving
   this.password = await bcrypt.hash(this.password, 10);
 });
+
 
 // During login , checking password and the hash pasword in the database is matched or not
 // schema.methods.comparePassword =  async function(enteredPassword){

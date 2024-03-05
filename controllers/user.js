@@ -1,5 +1,6 @@
 import { asyncError } from "../middlewares/error.js";
 import { User } from "../models/user.js";
+import { Wallet } from "../models/walletone.js";
 import ErrorHandler from "../utils/error.js";
 import { getDataUri, sendToken } from "../utils/features.js";
 
@@ -72,6 +73,50 @@ export const getMyProfile = asyncError(async (req, res, next) => {
     user,
   });
 });
+
+export const getUserDetails = asyncError(async (req, res, next) => {
+  const user = await User.findById(req.params.id).populate("walletOne").populate("walletTwo");
+
+  if (!user) return next(new ErrorHandler("User not found", 404));
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+});
+
+
+export const updateWallet = asyncError(async (req,res,next) => {
+
+
+  try {
+    const { walletId } = req.params;
+    const { balance, walletName, visibility } = req.body;
+
+    // Validate input
+    if (!balance || isNaN(balance)) {
+      return res.status(400).json({ success: false, message: 'Invalid balance value' });
+    }
+
+    // Update wallet
+    const updatedWallet = await Wallet.findByIdAndUpdate(walletId, { balance, walletName, visibility }, { new: true });
+
+    if (!updatedWallet) {
+      return res.status(404).json({ success: false, message: 'Wallet not found' });
+    }
+
+    // Optionally, you may want to update the user document as well
+    // For example, if you want to update the user's wallet details in the user document
+    // You can find the user associated with the wallet and update its details accordingly
+    // const user = await User.findOneAndUpdate({ $or: [{ walletOne: walletId }, { walletTwo: walletId }] }, { $set: { 'walletOne': updatedWallet } }, { new: true });
+
+    res.status(200).json({ success: true, updatedWallet });
+  } catch (error) {
+    console.error('Error updating wallet:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+
+})
 
 export const logout = asyncError(async (req, res, next) => {
   res.status(200).json({
@@ -177,3 +222,19 @@ export const updatePic = asyncError(async (req, res, next) => {
       user,
     });
   });
+
+  // For Admin 
+
+// ####################
+// ALL USER
+// ####################
+
+export const getAllUser = asyncError(async (req, res, next) => {
+  
+  const users = await User.find({});
+
+  res.status(200).json({
+    success: true,
+    users,
+  });
+});

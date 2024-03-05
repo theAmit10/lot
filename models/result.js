@@ -9,6 +9,16 @@ const schema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "LotDate",
         required: [true,"please enter date id"]
+    },
+    lottime:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "LotTime",
+        required: [true,"please enter Time id"]
+    },
+    lotlocation:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "LotLocation",
+        required: [true,"please enter Location id"]
     }
     ,
     createdAt:{

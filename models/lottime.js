@@ -1,13 +1,14 @@
 import mongoose from "mongoose";
 
 const schema = new mongoose.Schema({
-    lotdate: {
+    lottime: {
         type: String,
         required: [true,"Please enter time"]
     },
     lotlocation:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "LotLocation"
+        ref: "LotLocation",
+        required: [true,"please enter Location id"]
     },
     createdAt:{
         type: Date,

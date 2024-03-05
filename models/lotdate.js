@@ -7,7 +7,8 @@ const schema = new mongoose.Schema({
     },
     lottime:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "LotTime"
+        ref: "LotTime",
+        required: [true,"please enter time id"]
     },
     createdAt:{
         type: Date,
