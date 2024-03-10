@@ -3,6 +3,8 @@ import { config } from "dotenv";
 import user from "./routes/user.js"
 import result from "./routes/result.js"
 import { errorMiddleware } from "./middlewares/error.js";
+import cors from "cors"
+
 
 config({
     path: "./data/config.env",
@@ -10,6 +12,13 @@ config({
 
 
 export const app = express();
+
+// Using Cors 
+app.use(cors({
+    credentials: true,
+    methods: ["GET","POST","PUT","DELETE"],
+    origin: [process.env.FRONTEND_URL_1,process.env.FRONTEND_URL_2]
+}))
 
 
 // Use Middleware 
