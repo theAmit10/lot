@@ -61,6 +61,10 @@ schema.pre("save", async function (next) {
     return;
   }
 
+
+  // Encrypt the password before saving
+  this.password = await bcrypt.hash(this.password, 10);
+
   try {
     const walletOne = await Wallet.create({
         userId: this._id,
@@ -82,8 +86,6 @@ schema.pre("save", async function (next) {
     next(error);
   }
 
-  // Encrypt the password before saving
-  this.password = await bcrypt.hash(this.password, 10);
 });
 
 
