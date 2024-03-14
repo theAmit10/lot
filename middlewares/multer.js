@@ -1,6 +1,16 @@
 import multer from "multer";
+import path from "path"
+import datauri from "datauri"
 
-const storage = multer.memoryStorage();
+// const storage = multer.memoryStorage();
+var storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/uploads')
+    },
+    filename: (req, file, cb) => {
+        cb(null, req.user._id + path.extname(file.originalname))
+    }
+});
 
 export const singleUpload = multer(
     {

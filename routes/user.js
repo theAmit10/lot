@@ -1,5 +1,5 @@
 import express from "express"
-import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateWallet } from "../controllers/user.js";
+import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic, updateWallet,getProfilePic } from "../controllers/user.js";
 import { isAuthenticated, verifyToken } from "../middlewares/auth.js";
 import { singleUpload } from "../middlewares/multer.js";
 
@@ -27,6 +27,8 @@ router.route("/forgetpassword").post(forgetPassword).put(resetPassword)
 // FOR ADMIN WORK
 router.get("/alluser",isAuthenticated,getAllUser);
 
+router.post("/updateprofilepic",isAuthenticated,singleUpload,updateProfilePic);
+router.get("/getprofilepic",isAuthenticated,getProfilePic)
 
 
 export default router;

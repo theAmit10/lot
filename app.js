@@ -20,9 +20,14 @@ app.use(cors({
     origin: [process.env.FRONTEND_URL_1,process.env.FRONTEND_URL_2]
 }))
 
+// app.use(bodyParser.urlencoded({ extended: false }))
+// app.use(bodyParser.json())
 
 // Use Middleware 
 app.use(express.json())
+
+// for getting image
+app.use(express.static('public'))
 
 // Handeling Routes
 

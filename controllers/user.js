@@ -3,6 +3,7 @@ import { User } from "../models/user.js";
 import { Wallet } from "../models/walletone.js";
 import ErrorHandler from "../utils/error.js";
 import { getDataUri, sendToken } from "../utils/features.js";
+import mongoose  from "mongoose"
 
 export const login = asyncError(async (req, res, next) => {
   const { email, password } = req.body;
@@ -222,6 +223,59 @@ export const updatePic = asyncError(async (req, res, next) => {
       user,
     });
   });
+
+// For uploading profile pic
+  export const updateProfilePic = asyncError(async (req, res, next) => {
+    const user = await User.findById(req.user._id);
+  
+    // const { name, email } = req.body;
+
+    // Using this We can access the file
+    // req.file
+
+    console.log(req.file)
+
+    const { filename, path, mimetype } = req.file;
+
+    const file =  getDataUri(req.file)
+
+    // const Image = mongoose.model('Image', imageSchema);
+
+
+    // // Save metadata to MongoDB
+    // const image = new ImageModel({
+    //   filename,
+    //   path,
+    //   contentType: mimetype
+    // });
+    // await image.save();
+  
+    user.avatar = {
+      public_id: req.user._id,
+      url: filename
+    }
+  
+    await user.save();
+  
+    res.status(200).json({
+      success: true,
+      message: "Profile Pic Updated Successfully",
+    });
+  });
+
+  // For uploading profile pic
+  export const getProfilePic = asyncError(async (req, res, next) => {
+    // await User.findById(req.user._id);
+    const users =  await User.find();
+
+    res.status(200).json({
+      success: true,
+      message: users
+    });
+  });
+
+
+  
 
   // For Admin 
 
