@@ -1,6 +1,6 @@
 import multer from "multer";
 import path from "path"
-import datauri from "datauri"
+
 
 // const storage = multer.memoryStorage();
 var storage = multer.diskStorage({
