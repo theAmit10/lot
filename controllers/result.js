@@ -9,10 +9,11 @@ import { LotLocation } from "../models/lotlocation.js";
 // RESULTS
 // ####################
 
+// Searching for Reasult
+  // const results = await Result.find({}).populate("lotdate");
 
 export const getAllResult = asyncError(async (req, res, next) => {
-  // Searching for Reasult
-  // const results = await Result.find({}).populate("lotdate");
+  
   const results = await Result.find({}).populate("lotdate").populate("lottime").populate("lotlocation");
 
   res.status(200).json({
@@ -20,6 +21,57 @@ export const getAllResult = asyncError(async (req, res, next) => {
     results,
   });
 });
+
+// export const getAllResultAccordingToDateTimeLocation = asyncError(async (req, res, next) => {
+//   const { lotdateId, lottimeId, lotlocationId } = req.query;
+
+//   let results = await Result.find({}).populate("lotdate").populate("lottime").populate("lotlocation");
+
+//   if (lotdateId && lottimeId && lotlocationId) {
+//     // Filter results array based on all three parameters
+//     results = results.filter(item => item.lotdate._id.toString() === lotdateId && item.lottime._id.toString() === lottimeId && item.lotlocation._id.toString() === lotlocationId);
+//   } 
+
+//   res.status(200).json({
+//     success: true,
+//     results,
+//   });
+// });
+
+export const getAllResultAccordingToDateTimeLocation = asyncError(async (req, res, next) => {
+  const { lotdateId, lottimeId, lotlocationId } = req.query;
+
+  try {
+    let results = await Result.find({})
+      .populate("lotdate")
+      .populate("lottime")
+      .populate("lotlocation")
+      .exec();
+
+    if (lotdateId && lottimeId && lotlocationId) {
+      // Filter results array based on all three parameters
+      results = results.filter(item => 
+        item.lotdate && item.lottime && item.lotlocation && // Ensure all populated fields are not null
+        item.lotdate._id.toString() === lotdateId &&
+        item.lottime._id.toString() === lottimeId &&
+        item.lotlocation._id.toString() === lotlocationId
+      );
+    } 
+
+    res.status(200).json({
+      success: true,
+      results,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+
+
+
+
+
 
 export const getResultDetails = asyncError(async (req, res, next) => {
   const result = await Result.findById(req.params.id);
@@ -87,6 +139,28 @@ export const getAllLotDate = asyncError(async (req, res, next) => {
   });
 });
 
+export const getAllLotDateAccordindLocationAndTime = asyncError(async (req, res, next) => {
+  const { lottimeId, lotlocationId } = req.query;
+
+  let lotdates = await LotDate.find({}).populate("lottime");
+
+  if (lottimeId && lotlocationId) {
+    // Filter lotdates array based on both lottimeId and lotlocationId
+    lotdates = lotdates.filter(item => item.lottime._id.toString() === lottimeId && item.lottime.lotlocation.toString() === lotlocationId);
+  } else if (lottimeId) {
+    // Filter lotdates array based on lottimeId
+    lotdates = lotdates.filter(item => item.lottime._id.toString() === lottimeId);
+  } else if (lotlocationId) {
+    // Filter lotdates array based on lotlocationId
+    lotdates = lotdates.filter(item => item.lottime.lotlocation.toString() === lotlocationId);
+  }
+
+  res.status(200).json({
+    success: true,
+    lotdates,
+  });
+});
+
 export const deleteLotDate = asyncError(async (req, res, next) => {
   const lotdate = await LotDate.findById(req.params.id);
 
@@ -144,6 +218,22 @@ export const addLotTime = asyncError(async (req, res, next) => {
     res.status(200).json({
       success: true,
       lottimes,
+    });
+  });
+
+  export const getAllLotTimeAccordindLocation = asyncError(async (req, res, next) => {
+    const { locationid } = req.query;
+    
+    let lottimes = await LotTime.find({}).populate("lotlocation");
+
+    if (locationid) {
+        // Filter lottimes array based on locationid
+        lottimes = lottimes.filter(item => item.lotlocation._id.toString() === locationid);
+    }
+
+    res.status(200).json({
+        success: true,
+        lottimes,
     });
   });
 
