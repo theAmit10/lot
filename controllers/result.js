@@ -22,21 +22,7 @@ export const getAllResult = asyncError(async (req, res, next) => {
   });
 });
 
-// export const getAllResultAccordingToDateTimeLocation = asyncError(async (req, res, next) => {
-//   const { lotdateId, lottimeId, lotlocationId } = req.query;
 
-//   let results = await Result.find({}).populate("lotdate").populate("lottime").populate("lotlocation");
-
-//   if (lotdateId && lottimeId && lotlocationId) {
-//     // Filter results array based on all three parameters
-//     results = results.filter(item => item.lotdate._id.toString() === lotdateId && item.lottime._id.toString() === lottimeId && item.lotlocation._id.toString() === lotlocationId);
-//   } 
-
-//   res.status(200).json({
-//     success: true,
-//     results,
-//   });
-// });
 
 export const getAllResultAccordingToDateTimeLocation = asyncError(async (req, res, next) => {
   const { lotdateId, lottimeId, lotlocationId } = req.query;
