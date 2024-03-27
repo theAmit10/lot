@@ -1,6 +1,6 @@
 import express from "express"
 import { isAdmin, isAuthenticated } from "../middlewares/auth.js";
-import { addLotDate, addLotLocatin, addLotTime, createResult, deleteLotDate, deleteLotLocation, deleteLotTime, getAllLotDate, getAllLotDateAccordindLocationAndTime, getAllLotLocation, getAllLotTime, getAllLotTimeAccordindLocation, getAllResult, getAllResultAccordingToDateTimeLocation, getResultDetails, updateDate, updateLocation, updateResult, updateTime } from "../controllers/result.js";
+import { addLotDate, addLotLocatin, addLotTime, createResult, deleteLotDate, deleteLotLocation, deleteLotTime, getAllLotDate, getAllLotDateAccordindLocationAndTime, getAllLotLocation, getAllLotTime, getAllLotTimeAccordindLocation, getAllResult, getAllResultAccordingToDateTimeLocation, getAllResultAccordingToLocation, getResultDetails, updateDate, updateLocation, updateResult, updateTime } from "../controllers/result.js";
 
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.get("/allresult",isAuthenticated,getAllResult);
 router.route("/single/:id").get(isAuthenticated,getResultDetails).put(isAuthenticated,updateResult);
 router.post("/createresult",isAuthenticated,createResult);
 router.get("/searchresult",isAuthenticated,getAllResultAccordingToDateTimeLocation);
+router.get("/allresultlocation",isAuthenticated,getAllResultAccordingToLocation);
 
 // for LotDates
 router.post("/addlotdate",isAuthenticated,addLotDate);

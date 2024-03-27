@@ -1,14 +1,16 @@
 import { asyncError } from "../middlewares/error.js";
+import { Promotion } from "../models/promotion.js";
+// import { Promotion } from "../models/promotion.js";
 import { User } from "../models/user.js";
 import { Wallet } from "../models/walletone.js";
 import ErrorHandler from "../utils/error.js";
 import { getDataUri, sendToken } from "../utils/features.js";
-import mongoose  from "mongoose"
+import mongoose from "mongoose";
 
 export const login = asyncError(async (req, res, next) => {
   const { email, password } = req.body;
 
-  if(!password) return next(new ErrorHandler("Please enter password", 400));
+  if (!password) return next(new ErrorHandler("Please enter password", 400));
 
   const user = await User.findOne({ email }).select("+password");
   // console.log(password)
@@ -67,7 +69,9 @@ export const register = asyncError(async (req, res, next) => {
 });
 
 export const getMyProfile = asyncError(async (req, res, next) => {
-  const user = await User.findById(req.user._id).populate("walletOne").populate("walletTwo");;
+  const user = await User.findById(req.user._id)
+    .populate("walletOne")
+    .populate("walletTwo");
 
   res.status(200).json({
     success: true,
@@ -76,7 +80,9 @@ export const getMyProfile = asyncError(async (req, res, next) => {
 });
 
 export const getUserDetails = asyncError(async (req, res, next) => {
-  const user = await User.findById(req.params.id).populate("walletOne").populate("walletTwo");
+  const user = await User.findById(req.params.id)
+    .populate("walletOne")
+    .populate("walletTwo");
 
   if (!user) return next(new ErrorHandler("User not found", 404));
 
@@ -86,24 +92,29 @@ export const getUserDetails = asyncError(async (req, res, next) => {
   });
 });
 
-
-export const updateWallet = asyncError(async (req,res,next) => {
-
-
+export const updateWallet = asyncError(async (req, res, next) => {
   try {
     const { walletId } = req.params;
     const { balance, walletName, visibility } = req.body;
 
     // Validate input
     if (!balance || isNaN(balance)) {
-      return res.status(400).json({ success: false, message: 'Invalid balance value' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid balance value" });
     }
 
     // Update wallet
-    const updatedWallet = await Wallet.findByIdAndUpdate(walletId, { balance, walletName, visibility }, { new: true });
+    const updatedWallet = await Wallet.findByIdAndUpdate(
+      walletId,
+      { balance, walletName, visibility },
+      { new: true }
+    );
 
     if (!updatedWallet) {
-      return res.status(404).json({ success: false, message: 'Wallet not found' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Wallet not found" });
     }
 
     // Optionally, you may want to update the user document as well
@@ -113,11 +124,10 @@ export const updateWallet = asyncError(async (req,res,next) => {
 
     res.status(200).json({ success: true, updatedWallet });
   } catch (error) {
-    console.error('Error updating wallet:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error("Error updating wallet:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
-
-})
+});
 
 export const logout = asyncError(async (req, res, next) => {
   res.status(200).json({
@@ -145,13 +155,14 @@ export const updateProfile = asyncError(async (req, res, next) => {
 export const changePassword = asyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id).select("+password");
 
-  const {oldPassword, newPassword}  = req.body;
+  const { oldPassword, newPassword } = req.body;
 
-  // Checking the user have enter old and new password 
-  if(!oldPassword && !newPassword) return next(new ErrorHandler("Please enter old and new password", 400));
+  // Checking the user have enter old and new password
+  if (!oldPassword && !newPassword)
+    return next(new ErrorHandler("Please enter old and new password", 400));
 
   const isMatched = await user.comparePassword(oldPassword);
-  
+
   if (!isMatched) {
     return next(new ErrorHandler("Incorrect Old Password", 400));
   }
@@ -168,123 +179,254 @@ export const changePassword = asyncError(async (req, res, next) => {
 
 // Upload Profile pic work is not completed i have to research something because i dont want to use cloundinay
 export const updatePic = asyncError(async (req, res, next) => {
-    const user = await User.findById(req.user._id);
+  const user = await User.findById(req.user._id);
 
-    // req.file
-    const file = getDataUri();
+  // req.file
+  const file = getDataUri();
 
-    // add cloundinary
-  
-    res.status(200).json({
-      success: true,
-      user,
-    });
+  // add cloundinary
+
+  res.status(200).json({
+    success: true,
+    user,
   });
+});
 
+export const forgetPassword = asyncError(async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
 
-  export const forgetPassword = asyncError(async (req, res, next) => {
-    
-    const {email} = req.body;
-    const user = await User.findOne({email})
+  if (!user) return next(new ErrorHandler("Incorrect email", 404));
 
-    if(!user) return next(new ErrorHandler("Incorrect email",404))
+  // Generating 6 digit otp
+  // max,min 2000,10000
+  // math.random()*(max-min)+min
 
-    // Generating 6 digit otp
-    // max,min 2000,10000
-    // math.random()*(max-min)+min
+  const randomSixDitgitNumber = Math.random() * (999999 - 100000) + 100000;
+  const otp = Math.floor(randomSixDitgitNumber);
+  const otp_expire = 15 * 60 * 1000;
 
-    const randomSixDitgitNumber = Math.random() * (999999 - 100000)+ 100000;
-    const otp = Math.floor(randomSixDitgitNumber);
-    const otp_expire = 15 * 60 * 1000;
+  // Adding to the user otp
+  user.otp = otp;
+  user.otp_expire = new Date(Date.now() + otp_expire);
 
-    // Adding to the user otp
-    user.otp = otp;
-    user.otp_expire = new Date(Date.now() + otp_expire);
+  console.log("OTP CODE :: " + otp);
 
-    console.log("OTP CODE :: "+otp)
+  await user.save();
 
-    await user.save();
+  // After Saving the otp we have to send a email
+  // sendEmail()
 
-    // After Saving the otp we have to send a email
-    // sendEmail()
-
-  
-    res.status(200).json({
-      success: true,
-      message: `Verification code has been sent to ${user.email}`
-    });
+  res.status(200).json({
+    success: true,
+    message: `Verification code has been sent to ${user.email}`,
   });
+});
 
-  export const resetPassword = asyncError(async (req, res, next) => {
-    const user = await User.findById(req.user._id);
-  
-    res.status(200).json({
-      success: true,
-      user,
-    });
+export const resetPassword = asyncError(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+
+  res.status(200).json({
+    success: true,
+    user,
   });
+});
 
 // For uploading profile pic
-  export const updateProfilePic = asyncError(async (req, res, next) => {
-    const user = await User.findById(req.user._id);
+export const updateProfilePic = asyncError(async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+
+  // const { name, email } = req.body;
+
+  // Using this We can access the file
+  // req.file
+
+  console.log(req.file);
+
+  const { filename, path, mimetype } = req.file;
+
+  const file = getDataUri(req.file);
+
+  // const Image = mongoose.model('Image', imageSchema);
+
+  // // Save metadata to MongoDB
+  // const image = new ImageModel({
+  //   filename,
+  //   path,
+  //   contentType: mimetype
+  // });
+  // await image.save();
+
+  user.avatar = {
+    public_id: req.user._id,
+    url: filename,
+  };
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Profile Pic Updated Successfully",
+  });
+});
+
+// For uploading profile pic
+export const getProfilePic = asyncError(async (req, res, next) => {
+  // await User.findById(req.user._id);
+  const users = await User.find();
+
+  res.status(200).json({
+    success: true,
+    message: users,
+  });
+});
+
+// For Promtions
+
+// export const addPromotion = asyncError(async (req, res, next) => {
+//   console.log(req.file);
+
+//   const { filename, path, mimetype } = req.file;
+
+//   const uniqueFilename = `${Date.now()}${filename}`;
+
+//   // // Assuming you want to save public_id and url of the image in the database
+//   // const promotionData = {
+//   //   url: uniqueFilename,
+//   //   // visibility: req.body.visibility, // Assuming you're passing visibility in the request body
+//   // };
+
+//   // // Create a new promotion record in the database
+//   // await Promotion.create(promotionData);
+
+//   const promotion = new Promotion({
+//     promotionimage: {
+//       public_id: Date.now(),
+//       url: uniqueFilename,
+//     },
+//     visibility: req.body.visibility || true,
+//   });
+
+//   try {
+//     const newPromotion = await promotion.save();
+//     // res.status(201).json(newPromotion);
+//     res.status(201).json({
+//       success: true,
+//       message: "Promotions Added Successfully",
+//       newPromotion
+//     });
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+
   
-    // const { name, email } = req.body;
+// });
 
-    // Using this We can access the file
-    // req.file
+export const addPromotion = asyncError(async (req, res, next) => {
+  console.log(req.file);
 
-    console.log(req.file)
+  const { filename, path, mimetype } = req.file;
 
-    const { filename, path, mimetype } = req.file;
+  // const uniqueFilename = `${Date.now()}${filename}`;
 
-    const file =  getDataUri(req.file)
+  // Assuming you want to save public_id and url of the image in the database
+  const promotionData = {
+    url: filename,
+    // visibility: req.body.visibility, // Assuming you're passing visibility in the request body
+  };
 
-    // const Image = mongoose.model('Image', imageSchema);
+  // Create a new promotion record in the database
+  await Promotion.create(promotionData);
+
+  res.status(200).json({
+    success: true,
+    message: "Promotions Added Successfully",
+  });
+});
+
+// export const addPromotion = asyncError(async (req, res, next) => {
+//   console.log(req.file);
+
+//   const { filename, path, mimetype } = req.file;
+
+//   const uniqueFilename = `${Date.now()}${filename}`; // Append timestamp to the filename
+
+//   const file = getDataUri(req.file);
+
+//   // Assuming you want to save public_id and url of the image in the database
+//   const promotionData = {
+//     url: uniqueFilename,
+//     // visibility: req.body.visibility, // Assuming you're passing visibility in the request body
+//   };
+
+//   // Create a new promotion record in the database
+//   await Promotion.create(promotionData);
+
+//   res.status(200).json({
+//     success: true,
+//     message: "Promotions Added Successfully",
+//   });
+// });
 
 
-    // // Save metadata to MongoDB
-    // const image = new ImageModel({
-    //   filename,
-    //   path,
-    //   contentType: mimetype
-    // });
-    // await image.save();
-  
-    user.avatar = {
-      public_id: req.user._id,
-      url: filename
-    }
-  
-    await user.save();
-  
-    res.status(200).json({
-      success: true,
-      message: "Profile Pic Updated Successfully",
+export const getAllPromotions = asyncError(async (req, res, next) => {
+  const promotions = await Promotion.find({});
+  res.status(200).json({
+    success: true,
+    promotions,
+  });
+});
+
+export const deletePromotion = asyncError(async (req, res, next) => {
+
+  const { id } = req.params;
+
+  // Find the promotion by ID and delete it
+  const deletedPromotion = await Promotion.findByIdAndDelete(id);
+
+  if (!deletedPromotion) {
+    return res.status(404).json({
+      success: false,
+      message: "Promotion not found",
     });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Promotion deleted successfully",
+    deletedPromotion,
   });
 
-  // For uploading profile pic
-  export const getProfilePic = asyncError(async (req, res, next) => {
-    // await User.findById(req.user._id);
-    const users =  await User.find();
+});
 
-    res.status(200).json({
-      success: true,
-      message: users
-    });
+export const updatePromotion = asyncError(async (req, res, next) => {
+  const { visibility } = req.body;
+
+  const promotion = await Promotion.findById(req.params.id);
+
+  if (!promotion) return next(new ErrorHandler("Promotion not found", 404));
+
+  console.log("Existing visibility:", promotion.visibility);
+  console.log("New visibility:", visibility);
+
+  promotion.visibility = visibility;
+
+  await promotion.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Promotion Updated Successfully",
+    promotion
   });
+});
 
-
-  
-
-  // For Admin 
+// For Admin
 
 // ####################
 // ALL USER
 // ####################
 
 export const getAllUser = asyncError(async (req, res, next) => {
-  
   const users = await User.find({});
 
   res.status(200).json({

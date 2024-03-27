@@ -29,6 +29,7 @@ app.use(express.json())
 // for getting image
 app.use(express.static('public'))
 
+
 // Handeling Routes
 
 app.get("/",(req,res,next) => {

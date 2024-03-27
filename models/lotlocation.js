@@ -5,6 +5,14 @@ const schema = new mongoose.Schema({
         type: String,
         required: [true,"Please enter location name"]
     },
+    locationTitle: {
+        type: String,
+        default: ""
+    },
+    locationDescription: {
+        type: String,
+        default: ""
+    },
     createdAt:{
         type: Date,
         default: Date.now(),

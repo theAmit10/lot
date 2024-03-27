@@ -1,7 +1,8 @@
 import express from "express"
-import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic, updateWallet,getProfilePic } from "../controllers/user.js";
+import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic, updateWallet,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion } from "../controllers/user.js";
 import { isAuthenticated, verifyToken } from "../middlewares/auth.js";
 import { singleUpload } from "../middlewares/multer.js";
+import { singleUploadForPromotion } from "../middlewares/promotionmiddlerware.js";
 
 const router = express.Router();
 
@@ -29,6 +30,13 @@ router.get("/alluser",isAuthenticated,getAllUser);
 
 router.post("/updateprofilepic",isAuthenticated,singleUpload,updateProfilePic);
 router.get("/getprofilepic",isAuthenticated,getProfilePic)
+
+
+// Route to get the promotion 
+router.get("/getallpromotion",isAuthenticated,getAllPromotions);
+router.post("/addpromotion",isAuthenticated,singleUploadForPromotion,addPromotion);
+router.delete("/removepromotion/:id",isAuthenticated,deletePromotion);
+router.put("/updatepromotion/:id",isAuthenticated,updatePromotion)
 
 
 export default router;
