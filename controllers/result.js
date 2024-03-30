@@ -33,8 +33,6 @@ export const getAllResultAccordingToLocation = asyncError(
       .populate("lottime")
       .populate("lotlocation");
 
-    // let lottimes = await LotTime.find({}).populate("lotlocation");
-
 
     if (locationid) {
       // Filter results array based on locationid
@@ -49,6 +47,96 @@ export const getAllResultAccordingToLocation = asyncError(
     });
   }
 );
+
+// for timer
+// export const getAllResultAccordingToLocation = asyncError(
+//   async (req, res, next) => {
+//     const { locationid } = req.query;
+
+//     // Get current date and time
+//     const currentDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+//     const currentTime = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' });
+
+//     console.log("Current Date:", currentDate);
+//     console.log("Current Time:", currentTime);
+
+//     let results = await Result.find({})
+//       .populate("lotdate")
+//       .populate("lottime")
+//       .populate("lotlocation");
+
+//     console.log("All Results:", results);
+
+//     // Filter results based on current date and time
+//     results = results.filter(item => {
+//       const lotDate = item.lotdate.lotdate;
+//       const lotTime = item.lottime.lottime;
+
+//       // Check if lotdate is same as current date and lottime is greater than or equal to current time
+//       return lotDate === currentDate && lotTime >= currentTime;
+//     });
+
+//     console.log("Filtered Results:", results);
+
+//     if (locationid) {
+//       // Filter results array based on locationid
+//       results = results.filter(item => item.lotlocation._id.toString() === locationid);
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       results,
+//     });
+//   }
+// );
+
+export const getNextResult = asyncError(
+  async (req, res, next) => {
+    const { locationid } = req.query;
+
+    // Get current date and time
+    const currentDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+    const currentTime = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' });
+
+    console.log("Current Date:", currentDate);
+    console.log("Current Time:", currentTime);
+
+    let results = await Result.find({})
+      .populate("lotdate")
+      .populate("lottime")
+      .populate("lotlocation");
+
+    console.log("All Results:", results);
+
+    // Filter results based on current date and time
+    results = results.filter(item => {
+      const lotDate = item.lotdate.lotdate;
+      const lotTime = item.lottime.lottime;
+
+      console.log("Lot Date:", lotDate);
+      console.log("Lot Time:", lotTime);
+
+      // Check if lotdate is same as current date and lottime is greater than or equal to current time
+      return lotDate === currentDate && (lotTime >= currentTime || !item.lotdate.lotdate);
+    });
+
+    console.log("Filtered Results:", results);
+
+    if (locationid) {
+      // Filter results array based on locationid
+      results = results.filter(item => item.lotlocation._id.toString() === locationid);
+    }
+
+    res.status(200).json({
+      success: true,
+      results,
+    });
+  }
+);
+
+
+
+
 
 export const getAllResultAccordingToDateTimeLocation = asyncError(
   async (req, res, next) => {
