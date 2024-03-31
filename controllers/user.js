@@ -319,7 +319,6 @@ export const getProfilePic = asyncError(async (req, res, next) => {
 //     res.status(400).json({ message: error.message });
 //   }
 
-  
 // });
 
 export const addPromotion = asyncError(async (req, res, next) => {
@@ -368,7 +367,6 @@ export const addPromotion = asyncError(async (req, res, next) => {
 //   });
 // });
 
-
 export const getAllPromotions = asyncError(async (req, res, next) => {
   const promotions = await Promotion.find({});
   res.status(200).json({
@@ -378,7 +376,6 @@ export const getAllPromotions = asyncError(async (req, res, next) => {
 });
 
 export const deletePromotion = asyncError(async (req, res, next) => {
-
   const { id } = req.params;
 
   // Find the promotion by ID and delete it
@@ -396,7 +393,6 @@ export const deletePromotion = asyncError(async (req, res, next) => {
     message: "Promotion deleted successfully",
     deletedPromotion,
   });
-
 });
 
 export const updatePromotion = asyncError(async (req, res, next) => {
@@ -416,7 +412,7 @@ export const updatePromotion = asyncError(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Promotion Updated Successfully",
-    promotion
+    promotion,
   });
 });
 
@@ -427,7 +423,7 @@ export const updatePromotion = asyncError(async (req, res, next) => {
 // ####################
 
 export const getAllUser = asyncError(async (req, res, next) => {
-  const users = await User.find({});
+  const users = await User.find({}).populate("walletOne").populate("walletTwo");
 
   res.status(200).json({
     success: true,
