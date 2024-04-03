@@ -1,4 +1,5 @@
 import { asyncError } from "../middlewares/error.js";
+import { LotAppAbout } from "../models/lotappabout.js";
 import { Promotion } from "../models/promotion.js";
 // import { Promotion } from "../models/promotion.js";
 import { User } from "../models/user.js";
@@ -48,6 +49,12 @@ export const login = asyncError(async (req, res, next) => {
 export const register = asyncError(async (req, res, next) => {
   const { name, email, password } = req.body;
 
+  // Count existing users whose role is not admin
+  let userCount = await User.countDocuments({ role: { $ne: "admin" } });
+
+  // Generate userId starting from 1000
+  const userId = 1000 + userCount;
+
   let user = await User.findOne({ email });
 
   if (user) return next(new ErrorHandler("User Already exist", 400));
@@ -58,9 +65,24 @@ export const register = asyncError(async (req, res, next) => {
     name,
     email,
     password,
+    userId, // Add userId to the user object
   });
 
   sendToken(user, res, `Registered Successfully`, 201);
+
+  // let user = await User.findOne({ email });
+
+  // if (user) return next(new ErrorHandler("User Already exist", 400));
+
+  // // add cloudinary here
+
+  // user = await User.create({
+  //   name,
+  //   email,
+  //   password,
+  // });
+
+  // sendToken(user, res, `Registered Successfully`, 201);
 
   //   res.status(201).json({
   //     success: true,
@@ -428,5 +450,71 @@ export const getAllUser = asyncError(async (req, res, next) => {
   res.status(200).json({
     success: true,
     users,
+  });
+});
+
+// #############################
+//  About us Section
+// #############################
+
+// About us update
+
+export const updateAbout = asyncError(async (req, res, next) => {
+  const about = await LotAppAbout.findById(req.params.id);
+
+  if (!about) return next(new ErrorHandler("about not found", 404));
+
+  const { aboutTitle, aboutDescription } = req.body;
+
+  if (aboutTitle) about.aboutTitle = aboutTitle;
+  if (aboutDescription) about.aboutDescription = aboutDescription;
+
+  await about.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Updated Successfully",
+  });
+});
+
+// Create Abuut app content
+export const createAbout = asyncError(async (req, res, next) => {
+  const { aboutTitle, aboutDescription } = req.body;
+  // if (!result) return next(new ErrorHandler("Result not found", 404))
+  await LotAppAbout.create({ aboutTitle, aboutDescription });
+
+  res.status(200).json({
+    success: true,
+    message: "Successfully added about us",
+  });
+});
+
+export const deleteAbout = asyncError(async (req, res, next) => {
+  const { id } = req.params;
+
+  // Find the promotion by ID and delete it
+  const deletedAbout = await LotAppAbout.findByIdAndDelete(id);
+
+  if (!deletedAbout) {
+    return res.status(404).json({
+      success: false,
+      message: "About not found",
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Successfully Deleted",
+    deleteAbout,
+  });
+});
+
+// Get all About Us
+export const getAllAbout = asyncError(async (req, res, next) => {
+  const aboutus = await LotAppAbout.find({});
+
+  res.status(200).json({
+    success: true,
+    aboutus,
   });
 });

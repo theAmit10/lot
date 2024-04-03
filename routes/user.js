@@ -1,5 +1,5 @@
 import express from "express"
-import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic, updateWallet,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion } from "../controllers/user.js";
+import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic, updateWallet,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion, createAbout, getAllAbout, deleteAbout, updateAbout } from "../controllers/user.js";
 import { isAuthenticated, verifyToken } from "../middlewares/auth.js";
 import { singleUpload } from "../middlewares/multer.js";
 import { singleUploadForPromotion } from "../middlewares/promotionmiddlerware.js";
@@ -38,6 +38,11 @@ router.post("/addpromotion",isAuthenticated,singleUploadForPromotion,addPromotio
 router.delete("/removepromotion/:id",isAuthenticated,deletePromotion);
 router.put("/updatepromotion/:id",isAuthenticated,updatePromotion)
 
+// route for the About us section
+router.post("/createabout",createAbout);
+router.get("/getallabout",getAllAbout);
+router.delete("/removeabout/:id",isAuthenticated,deleteAbout);
+router.put("/updateabout/:id",isAuthenticated,updateAbout)
 
 export default router;
 
