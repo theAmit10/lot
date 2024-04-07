@@ -28,7 +28,7 @@ router.route("/forgetpassword").post(forgetPassword).put(resetPassword)
 // FOR ADMIN WORK
 router.get("/alluser",isAuthenticated,getAllUser);
 
-router.post("/updateprofilepic",isAuthenticated,singleUpload,updateProfilePic);
+router.put("/updateprofilepic",isAuthenticated,singleUpload,updateProfilePic);
 router.get("/getprofilepic",isAuthenticated,getProfilePic)
 
 

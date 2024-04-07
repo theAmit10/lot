@@ -7,6 +7,8 @@ import { Wallet } from "../models/walletone.js";
 import ErrorHandler from "../utils/error.js";
 import { getDataUri, sendToken } from "../utils/features.js";
 import mongoose from "mongoose";
+import fs from 'fs';
+import pathModule from 'path';
 
 export const login = asyncError(async (req, res, next) => {
   const { email, password } = req.body;
@@ -262,6 +264,15 @@ export const updateProfilePic = asyncError(async (req, res, next) => {
 
   // Using this We can access the file
   // req.file
+
+ 
+  if (user.avatar) {
+    // Construct the path to the previous image
+    // const previousImagePath = pathModule.join(__dirname, '..', 'public', 'uploads', user.avatar.url);
+    // console.log("previous image path :: "+previousImagePath)
+    // Delete the previous image from the server
+    fs.unlinkSync(`./public/uploads/${user.avatar.url}`);
+  }
 
   console.log(req.file);
 
