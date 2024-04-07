@@ -7,4 +7,4 @@ const schema = new mongoose.Schema({
     visibility: Boolean
 });
 
-export const Wallet = mongoose.model("Wallet",schema);
+export const WalletOne = mongoose.model("WalletOne",schema);

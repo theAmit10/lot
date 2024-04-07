@@ -2,8 +2,10 @@ import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { WalletOne } from "./walletone.js";
+import { WalletTwo } from "./wallettwo.js";
 
-import { Wallet } from "./walletone.js";
+
 
 const schema = new mongoose.Schema({
   name: {
@@ -67,13 +69,13 @@ schema.pre("save", async function (next) {
   this.password = await bcrypt.hash(this.password, 10);
 
   try {
-    const walletOne = await Wallet.create({
+    const walletOne = await WalletOne.create({
         userId: this._id,
         walletName: 'Wallet One',
         visibility: true
     });
 
-    const walletTwo = await Wallet.create({
+    const walletTwo = await WalletTwo.create({
         userId: this._id,
         walletName: 'Wallet Two',
         visibility: true

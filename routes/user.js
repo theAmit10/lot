@@ -1,5 +1,5 @@
 import express from "express"
-import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic, updateWallet,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion, createAbout, getAllAbout, deleteAbout, updateAbout } from "../controllers/user.js";
+import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic, updateWallet,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion, createAbout, getAllAbout, deleteAbout, updateAbout, getAllWalletOne, getAllWalletTwo, updateAllWalletNameOne, updateAllWalletNameTwo, } from "../controllers/user.js";
 import { isAuthenticated, verifyToken } from "../middlewares/auth.js";
 import { singleUpload } from "../middlewares/multer.js";
 import { singleUploadForPromotion } from "../middlewares/promotionmiddlerware.js";
@@ -14,6 +14,13 @@ router.post("/register",register);
 
 router.get("/profile",isAuthenticated,getMyProfile);
 router.get("/logout",isAuthenticated,logout);
+
+// For Admin Side wallet 
+router.get("/allwalletone",isAuthenticated,getAllWalletOne);
+router.get("/allwallettwo",isAuthenticated,getAllWalletTwo);
+router.put("/updatewalletone",isAuthenticated,updateAllWalletNameOne);
+router.put("/updatewallettwo",isAuthenticated,updateAllWalletNameTwo);
+
 
 // All Routes regarding update
 router.put("/updateprofile",isAuthenticated,updateProfile);

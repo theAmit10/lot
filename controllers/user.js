@@ -3,12 +3,13 @@ import { LotAppAbout } from "../models/lotappabout.js";
 import { Promotion } from "../models/promotion.js";
 // import { Promotion } from "../models/promotion.js";
 import { User } from "../models/user.js";
-import { Wallet } from "../models/walletone.js";
+import {  WalletOne } from "../models/walletone.js";
 import ErrorHandler from "../utils/error.js";
 import { getDataUri, sendToken } from "../utils/features.js";
 import mongoose from "mongoose";
 import fs from 'fs';
 import pathModule from 'path';
+import { WalletTwo } from "../models/wallettwo.js";
 
 export const login = asyncError(async (req, res, next) => {
   const { email, password } = req.body;
@@ -280,15 +281,6 @@ export const updateProfilePic = asyncError(async (req, res, next) => {
 
   const file = getDataUri(req.file);
 
-  // const Image = mongoose.model('Image', imageSchema);
-
-  // // Save metadata to MongoDB
-  // const image = new ImageModel({
-  //   filename,
-  //   path,
-  //   contentType: mimetype
-  // });
-  // await image.save();
 
   user.avatar = {
     public_id: req.user._id,
@@ -527,5 +519,55 @@ export const getAllAbout = asyncError(async (req, res, next) => {
   res.status(200).json({
     success: true,
     aboutus,
+  });
+});
+
+
+// Get All WalletOne 
+export const getAllWalletOne = asyncError(async (req, res, next) => {
+  const wallets = await WalletOne.find({});
+
+  res.status(200).json({
+    success: true,
+    wallets,
+  });
+});
+
+// Get All WalletTwo
+export const getAllWalletTwo = asyncError(async (req, res, next) => {
+  const wallets = await WalletTwo.find({});
+
+  res.status(200).json({
+    success: true,
+    wallets,
+  });
+});
+
+// Update Wallet name
+// Controller function to update wallet names in all data
+export const updateAllWalletNameOne = asyncError(async (req, res, next) => {
+  const walletName = req.body.walletName; // Assuming you pass new wallet name in the request body
+
+  // Update wallet names in all data
+  await WalletOne.updateMany({}, { $set: { walletName: walletName } });
+
+  res.status(200).json({
+      success: true,
+      message: 'Wallet names updated successfully in all data.',
+  });
+});
+
+
+// Update Wallet name
+// Controller function to update wallet names in all data
+export const updateAllWalletNameTwo = asyncError(async (req, res, next) => {
+  const walletName = req.body.walletName; // Assuming you pass new wallet name in the request body
+
+  // Update wallet names in all data
+  await WalletTwo.updateMany({}, { $set: { walletName: walletName } });
+
+  res.status(200).json({
+      success: true,
+      message: 'Wallet names updated successfully in all data.',
   });
 });
