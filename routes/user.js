@@ -1,5 +1,5 @@
 import express from "express"
-import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic, updateWallet,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion, createAbout, getAllAbout, deleteAbout, updateAbout, getAllWalletOne, getAllWalletTwo, updateAllWalletNameOne, updateAllWalletNameTwo, } from "../controllers/user.js";
+import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion, createAbout, getAllAbout, deleteAbout, updateAbout, getAllWalletOne, getAllWalletTwo, updateAllWalletNameOne, updateAllWalletNameTwo, updateWalletOne, updateWalletTwo, } from "../controllers/user.js";
 import { isAuthenticated, verifyToken } from "../middlewares/auth.js";
 import { singleUpload } from "../middlewares/multer.js";
 import { singleUploadForPromotion } from "../middlewares/promotionmiddlerware.js";
@@ -27,7 +27,8 @@ router.put("/updateprofile",isAuthenticated,updateProfile);
 router.put("/changepassword",isAuthenticated,changePassword);
 router.put("/updatepic",isAuthenticated,singleUpload,updatePic);
 router.route("/singleuser/:id").get(isAuthenticated,getUserDetails);
-router.put("/wallet/:walletId",isAuthenticated,updateWallet)
+router.put("/walletone/:walletId",isAuthenticated,updateWalletOne)
+router.put("/wallettwo/:walletId",isAuthenticated,updateWalletTwo);
 
 // All routes regardin reset and forgot password
 router.route("/forgetpassword").post(forgetPassword).put(resetPassword)

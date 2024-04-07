@@ -3,12 +3,12 @@ import { LotAppAbout } from "../models/lotappabout.js";
 import { Promotion } from "../models/promotion.js";
 // import { Promotion } from "../models/promotion.js";
 import { User } from "../models/user.js";
-import {  WalletOne } from "../models/walletone.js";
 import ErrorHandler from "../utils/error.js";
 import { getDataUri, sendToken } from "../utils/features.js";
 import mongoose from "mongoose";
 import fs from 'fs';
 import pathModule from 'path';
+import { WalletOne } from "../models/walletone.js";
 import { WalletTwo } from "../models/wallettwo.js";
 
 export const login = asyncError(async (req, res, next) => {
@@ -117,7 +117,9 @@ export const getUserDetails = asyncError(async (req, res, next) => {
   });
 });
 
-export const updateWallet = asyncError(async (req, res, next) => {
+
+// Update Wallet One
+export const updateWalletOne = asyncError(async (req, res, next) => {
   try {
     const { walletId } = req.params;
     const { balance, walletName, visibility } = req.body;
@@ -130,7 +132,7 @@ export const updateWallet = asyncError(async (req, res, next) => {
     }
 
     // Update wallet
-    const updatedWallet = await Wallet.findByIdAndUpdate(
+    const updatedWallet = await WalletOne.findByIdAndUpdate(
       walletId,
       { balance, walletName, visibility },
       { new: true }
@@ -142,10 +144,38 @@ export const updateWallet = asyncError(async (req, res, next) => {
         .json({ success: false, message: "Wallet not found" });
     }
 
-    // Optionally, you may want to update the user document as well
-    // For example, if you want to update the user's wallet details in the user document
-    // You can find the user associated with the wallet and update its details accordingly
-    // const user = await User.findOneAndUpdate({ $or: [{ walletOne: walletId }, { walletTwo: walletId }] }, { $set: { 'walletOne': updatedWallet } }, { new: true });
+    res.status(200).json({ success: true, updatedWallet });
+  } catch (error) {
+    console.error("Error updating wallet:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+});
+
+// Update Wallet Two
+export const updateWalletTwo = asyncError(async (req, res, next) => {
+  try {
+    const { walletId } = req.params;
+    const { balance, walletName, visibility } = req.body;
+
+    // Validate input
+    if (!balance || isNaN(balance)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid balance value" });
+    }
+
+    // Update wallet
+    const updatedWallet = await WalletTwo.findByIdAndUpdate(
+      walletId,
+      { balance, walletName, visibility },
+      { new: true }
+    );
+
+    if (!updatedWallet) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Wallet not found" });
+    }
 
     res.status(200).json({ success: true, updatedWallet });
   } catch (error) {

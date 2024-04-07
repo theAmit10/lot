@@ -6,7 +6,6 @@ import { WalletOne } from "./walletone.js";
 import { WalletTwo } from "./wallettwo.js";
 
 
-
 const schema = new mongoose.Schema({
   name: {
     type: String,
@@ -24,8 +23,8 @@ const schema = new mongoose.Schema({
     minLength: [6, "Password must be atleast 6 characters long"],
     select: false,
   },
-  walletOne: { type: mongoose.Schema.Types.ObjectId, ref: 'Wallet' },
-  walletTwo: { type: mongoose.Schema.Types.ObjectId, ref: 'Wallet' },
+  walletOne: { type: mongoose.Schema.Types.ObjectId, ref: 'WalletOne' },
+  walletTwo: { type: mongoose.Schema.Types.ObjectId, ref: 'WalletTwo' },
   role: {
     type: String,
     enum: ["admin", "user"],
