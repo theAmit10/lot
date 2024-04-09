@@ -288,29 +288,121 @@ export const resetPassword = asyncError(async (req, res, next) => {
 });
 
 // For uploading profile pic
+// export const updateProfilePic = asyncError(async (req, res, next) => {
+//   const user = await User.findById(req.user._id);
+
+//   // const { name, email } = req.body;
+//   // Using this We can access the file
+//   // req.file
+
+ 
+//   // if (user.avatar.url) {
+//   //   // Construct the path to the previous image
+//   //   // const previousImagePath = pathModule.join(__dirname, '..', 'public', 'uploads', user.avatar.url);
+//   //   // console.log("previous image path :: "+previousImagePath)
+//   //   // Delete the previous image from the server
+//   //   fs.unlinkSync(`./public/uploads/${user.avatar.url}`);
+//   // }
+
+//   console.log(req.file);
+
+//   const { filename, path, mimetype } = req.file;
+
+//   const file = getDataUri(req.file);
+
+
+//   user.avatar = {
+//     public_id: req.user._id,
+//     url: filename,
+//   };
+
+//   await user.save();
+
+//   res.status(200).json({
+//     success: true,
+//     message: "Profile Pic Updated Successfully",
+//   });
+// });
+
+
+// For uploading profile pic
+// export const updateProfilePic = asyncError(async (req, res, next) => {
+//   const user = await User.findById(req.user._id);
+
+//   // Check if a file is provided in the request
+//   if (!req.file) {
+//     return res.status(400).json({
+//       success: false,
+//       message: "No file uploaded",
+//     });
+//   }
+
+//   const { filename } = req.file;
+
+//   // If user already has an avatar, delete the previous image
+//   if (user.avatar && user.avatar.url) {
+//     // Construct the path to the previous image
+//     const previousImagePath = pathModule.join(__dirname, '..', 'public', 'uploads', user.avatar.url);
+//     try {
+//       // Delete the previous image from the server
+//       fs.unlinkSync(previousImagePath);
+//     } catch (err) {
+//       console.error("Error deleting previous image:", err);
+//     }
+//   }
+
+//   console.log(req.file);
+
+//   const file = getDataUri(req.file);
+
+//   user.avatar = {
+//     public_id: req.user._id,
+//     url: filename,
+//   };
+
+//   await user.save();
+
+//   res.status(200).json({
+//     success: true,
+//     message: "Profile Pic Updated Successfully",
+//   });
+// });
+
+
+
+
+// For uploading profile pic
 export const updateProfilePic = asyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id);
 
-  // const { name, email } = req.body;
+  // Check if a file is provided in the request
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "No file uploaded",
+    });
+  }
 
-  // Using this We can access the file
-  // req.file
+  const { filename } = req.file;
 
- 
-  if (user.avatar) {
+  // Get the directory name of the current module using import.meta.url
+  const currentDir = pathModule.dirname(new URL(import.meta.url).pathname);
+
+  // If user already has an avatar, delete the previous image
+  if (user.avatar && user.avatar.url) {
     // Construct the path to the previous image
-    // const previousImagePath = pathModule.join(__dirname, '..', 'public', 'uploads', user.avatar.url);
-    // console.log("previous image path :: "+previousImagePath)
-    // Delete the previous image from the server
-    fs.unlinkSync(`./public/uploads/${user.avatar.url}`);
+    const previousImagePath = pathModule.join(currentDir, '..', 'public', 'uploads', user.avatar.url);
+    try {
+      // Delete the previous image from the server
+      fs.unlinkSync(previousImagePath);
+    } catch (err) {
+      console.error("Error deleting previous image:", err);
+    }
   }
 
   console.log(req.file);
 
-  const { filename, path, mimetype } = req.file;
-
   const file = getDataUri(req.file);
-
 
   user.avatar = {
     public_id: req.user._id,
@@ -324,6 +416,7 @@ export const updateProfilePic = asyncError(async (req, res, next) => {
     message: "Profile Pic Updated Successfully",
   });
 });
+
 
 // For uploading profile pic
 export const getProfilePic = asyncError(async (req, res, next) => {
