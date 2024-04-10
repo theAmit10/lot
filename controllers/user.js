@@ -564,6 +564,55 @@ export const updatePromotion = asyncError(async (req, res, next) => {
   });
 });
 
+export const updateAnyUserUserId = asyncError(async (req, res, next) => {
+ 
+  try {
+    const userId = req.params.userId;
+    const newUserId = req.body.newUserId;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: 'Invalid user id' });
+    }
+
+    if (!newUserId) {
+      return res.status(400).json({ success: false, message: 'New userid missing' });
+    }
+
+
+    // Check if the new userId is unique and not used by any other user
+    const existingUser = await User.findOne({ userId: newUserId });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'New userId is already taken.' });
+    }
+
+    // Find the user by the provided userId
+    const user = await User.findOne({ userId: userId });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found.' });
+    }
+
+    // Update the userId of the user
+    user.userId = newUserId;
+    await user.save();
+
+    return res.status(200).json({ success: true, message: 'User userId updated successfully.' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+  
+
+ 
+
+
+
+  
+
+ 
+
+
+});
+
 // For Admin
 
 // ####################
@@ -601,6 +650,7 @@ export const updateAbout = asyncError(async (req, res, next) => {
     success: true,
     message: "Updated Successfully",
   });
+  
 });
 
 // Create Abuut app content

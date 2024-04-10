@@ -1,5 +1,5 @@
 import express from "express"
-import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion, createAbout, getAllAbout, deleteAbout, updateAbout, getAllWalletOne, getAllWalletTwo, updateAllWalletNameOne, updateAllWalletNameTwo, updateWalletOne, updateWalletTwo, } from "../controllers/user.js";
+import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion, createAbout, getAllAbout, deleteAbout, updateAbout, getAllWalletOne, getAllWalletTwo, updateAllWalletNameOne, updateAllWalletNameTwo, updateWalletOne, updateWalletTwo, updateAnyUserUserId, } from "../controllers/user.js";
 import { isAuthenticated, verifyToken } from "../middlewares/auth.js";
 import { singleUpload } from "../middlewares/multer.js";
 import { singleUploadForPromotion } from "../middlewares/promotionmiddlerware.js";
@@ -35,6 +35,7 @@ router.route("/forgetpassword").post(forgetPassword).put(resetPassword)
 
 // FOR ADMIN WORK
 router.get("/alluser",isAuthenticated,getAllUser);
+router.put("/updateuserid/:userId",isAuthenticated,updateAnyUserUserId)
 
 router.post("/updateprofilepic",isAuthenticated,singleUpload,updateProfilePic);
 router.get("/getprofilepic",isAuthenticated,getProfilePic)
