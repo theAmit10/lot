@@ -394,6 +394,12 @@ export const updateTime = asyncError(async (req, res, next) => {
 // ####################
 
 export const addLotLocatin = asyncError(async (req, res, next) => {
+
+  const { lotlocation, maximumRange } = req.body;
+
+  if (!lotlocation) return next(new ErrorHandler("enter lotlocation missing", 404));
+  if (!maximumRange) return next(new ErrorHandler("enter maximum range", 404));
+
   await LotLocation.create(req.body);
 
   res.status(201).json({

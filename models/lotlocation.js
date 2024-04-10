@@ -13,6 +13,10 @@ const schema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    maximumRange: {
+        type: Number,
+        required: [true,"Please enter maximum range"]
+    },
     createdAt:{
         type: Date,
         default: Date.now(),
