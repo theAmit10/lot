@@ -15,6 +15,7 @@ export const login = asyncError(async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!password) return next(new ErrorHandler("Please enter password", 400));
+  if (!email) return next(new ErrorHandler("Please enter email", 400));
 
   const user = await User.findOne({ email }).select("+password");
   // console.log(password)

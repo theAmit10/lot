@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/error.js";
 import { LotDate } from "../models/lotdate.js";
 import { LotTime } from "../models/lottime.js";
 import { LotLocation } from "../models/lotlocation.js";
+import mongoose from 'mongoose'
 
 // ####################
 // RESULTS
@@ -106,26 +107,49 @@ export const getNextResult = asyncError(
       .populate("lottime")
       .populate("lotlocation");
 
-    console.log("All Results:", results);
+    console.log("All Results:", results.length);
 
     // Filter results based on current date and time
     results = results.filter(item => {
       const lotDate = item.lotdate.lotdate;
       const lotTime = item.lottime.lottime;
 
-      console.log("Lot Date:", lotDate);
-      console.log("Lot Time:", lotTime);
-
+      console.log("Lot Date:", lotDate," Lot Time:", lotTime);
+    
       // Check if lotdate is same as current date and lottime is greater than or equal to current time
       return lotDate === currentDate && (lotTime >= currentTime || !item.lotdate.lotdate);
     });
 
     console.log("Filtered Results:", results);
 
+    // if (locationid) {
+      
+    //   // Filter results array based on locationid
+    //   results = results.filter(item => {
+    //     console.log("locationid :: "+locationid, "+ item.lotlocation._id :: "+item.lotlocation._id.toString())
+    //     return item.lotlocation._id.toString() === locationid
+    //   });
+    // }
+
+    // console.log("Final result length :: "+results.length)
+
+    // Adjust the filtering logic based on location ID
     if (locationid) {
-      // Filter results array based on locationid
-      results = results.filter(item => item.lotlocation._id.toString() === locationid);
-    }
+      results = results.filter(item => {
+          // Log the values and types for debugging
+          // console.log("Query locationid:", locationid.length," :: ",locationid);
+          // console.log("item.lotlocation._id:", item.lotlocation._id.length," :: ",item.lotlocation._id);
+          // console.log("item.lotlocation._id.toString():", item.lotlocation._id.toString().length," :: ",item.lotlocation._id.toString());
+
+          // console.log("Status === :: "+item.lotlocation._id.toString() === locationid)
+          // console.log("Status == :: "+item.lotlocation._id.toString() == locationid)
+  
+          // Compare locationid with item.lotlocation._id as strings
+          return item.lotlocation._id.toString() === locationid;
+      });
+  }
+
+console.log("Final result length:", results.length);
 
     res.status(200).json({
       success: true,
