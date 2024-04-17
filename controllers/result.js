@@ -5,6 +5,7 @@ import { LotDate } from "../models/lotdate.js";
 import { LotTime } from "../models/lottime.js";
 import { LotLocation } from "../models/lotlocation.js";
 import mongoose from 'mongoose'
+import moment from "moment";
 
 // ####################
 // RESULTS
@@ -137,16 +138,35 @@ export const getNextResult = asyncError(
     if (locationid) {
       results = results.filter(item => {
           // Log the values and types for debugging
-          // console.log("Query locationid:", locationid.length," :: ",locationid);
-          // console.log("item.lotlocation._id:", item.lotlocation._id.length," :: ",item.lotlocation._id);
-          // console.log("item.lotlocation._id.toString():", item.lotlocation._id.toString().length," :: ",item.lotlocation._id.toString());
+          console.log("Query locationid length :: ", locationid.length," :: ",locationid);
+        
+          console.log("item.lotlocation._id.toString():", item.lotlocation._id.toString().length," :: ",item.lotlocation._id.toString());
 
-          // console.log("Status === :: "+item.lotlocation._id.toString() === locationid)
-          // console.log("Status == :: "+item.lotlocation._id.toString() == locationid)
+          console.log("Status === :: ",item.lotlocation._id.toString() === locationid)
+       
   
           // Compare locationid with item.lotlocation._id as strings
           return item.lotlocation._id.toString() === locationid;
       });
+
+      // Filter results based on current date and time
+      // results = results.filter(item => {
+      //   // Normalize both current time and lot time to the format HH:MM AM/PM using moment library
+      //   const currentTimeFormatted = moment(currentTime, ['hh:mm A', 'hh-mm A']).format('hh:mm A');
+      //   const lotTimeFormatted = moment(item.lottime.lottime, ['hh:mm A', 'hh-mm A']).format('hh:mm A');
+
+      //   // Log the values for debugging
+      //   console.log("Current Time Formatted:", currentTimeFormatted);
+      //   console.log("Lot Time Formatted:", lotTimeFormatted);
+
+      //   // Compare lot date and time with current date and time
+      //   const lotDate = item.lotdate.lotdate;
+      //   console.log("Lot Date:", lotDate, "Current Date:", currentDate);
+
+      //   // Return true if the lot date matches the current date and lot time is greater than or equal to the current time
+      //   return lotDate === currentDate && lotTimeFormatted >= currentTimeFormatted;
+      // });
+
   }
 
 console.log("Final result length:", results.length);
@@ -211,13 +231,14 @@ export const getResultDetails = asyncError(async (req, res, next) => {
 });
 
 export const createResult = asyncError(async (req, res, next) => {
-  const { resultNumber, lotdate, lottime, lotlocation } = req.body;
+  const { resultNumber, lotdate, lottime, lotlocation,nextresulttime } = req.body;
   // if (!result) return next(new ErrorHandler("Result not found", 404))
   await Result.create({
     resultNumber,
     lotdate,
     lottime,
     lotlocation,
+    nextresulttime
   });
 
   res.status(200).json({
@@ -227,13 +248,14 @@ export const createResult = asyncError(async (req, res, next) => {
 });
 
 export const updateResult = asyncError(async (req, res, next) => {
-  const { resultNumber } = req.body;
+  const { resultNumber,nextresulttime } = req.body;
 
   const result = await Result.findById(req.params.id);
 
   if (!result) return next(new ErrorHandler("Result not found", 404));
 
   if (resultNumber) result.resultNumber = resultNumber;
+  if (nextresulttime) result.nextresulttime = nextresulttime;
 
   await result.save();
 

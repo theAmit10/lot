@@ -19,8 +19,11 @@ const schema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "LotLocation",
         required: [true,"please enter Location id"]
-    }
-    ,
+    },
+    nextresulttime:{
+        type: String,
+        required: [true,"please enter next result time"]
+    },
     createdAt:{
         type: Date,
         default: Date.now(),
