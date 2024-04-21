@@ -66,9 +66,37 @@ schema.pre("save", async function (next) {
   //   return;
   // }
 
-  if (this.isModified("password")) {
+  if (!this.isNew && this.isModified("password")) {
     // If the document is not new or password is not modified, skip wallet creation
     this.password = await bcrypt.hash(this.password, 10);
+    return;
+  }
+
+  if (this.isNew) {
+    // If the document is not new or password is not modified, skip wallet creation
+    try {
+
+      this.password = await bcrypt.hash(this.password, 10);
+
+      const walletOne = await WalletOne.create({
+          userId: this._id,
+          walletName: 'Wallet One',
+          visibility: true
+      });
+  
+      const walletTwo = await WalletTwo.create({
+          userId: this._id,
+          walletName: 'Wallet Two',
+          visibility: true
+      });
+  
+      this.walletOne = walletOne._id;
+      this.walletTwo = walletTwo._id;
+  
+      next();
+    } catch (error) {
+      next(error);
+    }
     return;
   }
 
@@ -90,26 +118,26 @@ schema.pre("save", async function (next) {
   // // Encrypt the password before saving
   // this.password = await bcrypt.hash(this.password, 10);
 
-  try {
-    const walletOne = await WalletOne.create({
-        userId: this._id,
-        walletName: 'Wallet One',
-        visibility: true
-    });
+  // try {
+  //   const walletOne = await WalletOne.create({
+  //       userId: this._id,
+  //       walletName: 'Wallet One',
+  //       visibility: true
+  //   });
 
-    const walletTwo = await WalletTwo.create({
-        userId: this._id,
-        walletName: 'Wallet Two',
-        visibility: true
-    });
+  //   const walletTwo = await WalletTwo.create({
+  //       userId: this._id,
+  //       walletName: 'Wallet Two',
+  //       visibility: true
+  //   });
 
-    this.walletOne = walletOne._id;
-    this.walletTwo = walletTwo._id;
+  //   this.walletOne = walletOne._id;
+  //   this.walletTwo = walletTwo._id;
 
-    next();
-  } catch (error) {
-    next(error);
-  }
+  //   next();
+  // } catch (error) {
+  //   next(error);
+  // }
 
 });
 
