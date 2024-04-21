@@ -266,6 +266,22 @@ export const updateResult = asyncError(async (req, res, next) => {
   });
 });
 
+// To delete a result
+export const deleteResult = asyncError(async (req, res, next) => {
+  const result = await Result.findById(req.params.id);
+
+  if (!result) {
+    return next(new ErrorHandler("Result not found", 404));
+  }
+
+  await Result.deleteOne({ _id: req.params.id });
+
+  res.status(200).json({
+    success: true,
+    message: "Result Deleted Successfully",
+  });
+});
+
 // ####################
 // LOT DATE
 // ####################
@@ -483,6 +499,10 @@ export const deleteLotLocation = asyncError(async (req, res, next) => {
     message: "Location Deleted Successfully",
   });
 });
+
+
+
+
 
 export const updateLocation = asyncError(async (req, res, next) => {
   const { lotlocation,locationTitle, locationDescription } = req.body;

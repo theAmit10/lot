@@ -676,7 +676,8 @@ export const getAllUserRegisterInLastOneDay = asyncError(
     // Find users created within the last 24 hours
     const users = await User.find({ createdAt: { $gte: twentyFourHoursAgo } })
       .populate("walletOne")
-      .populate("walletTwo");
+      .populate("walletTwo")
+      .sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
