@@ -60,15 +60,35 @@ const schema = new mongoose.Schema({
 // });
 
 schema.pre("save", async function (next) {
-  if (!this.isNew || !this.isModified("password")) {
+  // if (!this.isNew || !this.isModified("password")) {
+  //   // If the document is not new or password is not modified, skip wallet creation
+  //   next();
+  //   return;
+  // }
+
+  if (this.isModified("password")) {
+    // If the document is not new or password is not modified, skip wallet creation
+    this.password = await bcrypt.hash(this.password, 10);
+    return;
+  }
+
+  if (!this.isNew) {
     // If the document is not new or password is not modified, skip wallet creation
     next();
     return;
   }
 
+  if (!this.isModified("password")) {
+    // If the document is not new or password is not modified, skip wallet creation
+    next();
+    return;
+  }
 
-  // Encrypt the password before saving
-  this.password = await bcrypt.hash(this.password, 10);
+  
+
+
+  // // Encrypt the password before saving
+  // this.password = await bcrypt.hash(this.password, 10);
 
   try {
     const walletOne = await WalletOne.create({

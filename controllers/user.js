@@ -265,23 +265,23 @@ export const forgetPassword = asyncError(async (req, res, next) => {
   user.otp = otp;
   user.otp_expire = new Date(Date.now() + otp_expire);
 
-  console.log("OTP CODE :: " + otp);
+  // console.log("OTP CODE :: " + otp);
 
   await user.save();
 
   // After Saving the otp we have to send a email
   // sendEmail()
 
-  const message = `Your OTP For Reseting Password is ${otp}.\nPlease ignore if you haven't requested this`
+  const message = `Your OTP For Reseting Password is ${otp}\nPlease ignore if you haven't requested this`;
 
   try {
-    await sendEmail("OTP for resetting password",user.email,message);
+    await sendEmail("OTP for resetting password", user.email, message);
   } catch (error) {
     user.otp = null;
     user.otp_expire = null;
 
     await user.save();
-    return next(error)
+    return next(error);
   }
 
   res.status(200).json({
@@ -291,11 +291,30 @@ export const forgetPassword = asyncError(async (req, res, next) => {
 });
 
 export const resetPassword = asyncError(async (req, res, next) => {
-  const user = await User.findById(req.user._id);
+  const { otp, password } = req.body;
+
+  const user = await User.findOne({
+    otp,
+    otp_expire: {
+      $gt: Date.now(),
+    },
+  });
+
+  if (!user)
+    return next(new ErrorHandler("Incorrect OTP or OTP has been expired", 400));
+
+  if (!password)
+    return next(new ErrorHandler("Please enter new password ", 400));
+
+  user.password = password;
+  user.otp = undefined;
+  user.otp_expire = undefined;
+
+  await user.save();
 
   res.status(200).json({
     success: true,
-    user,
+    message: "Password changed successfully , you can login now",
   });
 });
 
@@ -630,7 +649,10 @@ export const updateAnyUserUserId = asyncError(async (req, res, next) => {
 // ####################
 
 export const getAllUser = asyncError(async (req, res, next) => {
-  const users = await User.find({}).populate("walletOne").populate("walletTwo").sort({ createdAt: -1 });;
+  const users = await User.find({})
+    .populate("walletOne")
+    .populate("walletTwo")
+    .sort({ createdAt: -1 });
 
   res.status(200).json({
     success: true,
@@ -640,23 +662,28 @@ export const getAllUser = asyncError(async (req, res, next) => {
 
 // All user who have register in last 24 hour
 
-export const  getAllUserRegisterInLastOneDay = asyncError(async (req, res, next) => {
-  // Get the current date and time in UTC
-  const currentDate = new Date();
-  const currentUTCDate = new Date(currentDate.toISOString());
+export const getAllUserRegisterInLastOneDay = asyncError(
+  async (req, res, next) => {
+    // Get the current date and time in UTC
+    const currentDate = new Date();
+    const currentUTCDate = new Date(currentDate.toISOString());
 
-  // Subtract 24 hours from the current date to get the date/time 24 hours ago
-  const twentyFourHoursAgo = new Date(currentUTCDate.getTime() - (24 * 60 * 60 * 1000));
+    // Subtract 24 hours from the current date to get the date/time 24 hours ago
+    const twentyFourHoursAgo = new Date(
+      currentUTCDate.getTime() - 24 * 60 * 60 * 1000
+    );
 
-  // Find users created within the last 24 hours
-  const users = await User.find({ createdAt: { $gte: twentyFourHoursAgo } }).populate("walletOne").populate("walletTwo");
+    // Find users created within the last 24 hours
+    const users = await User.find({ createdAt: { $gte: twentyFourHoursAgo } })
+      .populate("walletOne")
+      .populate("walletTwo");
 
-  res.status(200).json({
-    success: true,
-    users,
-  });
-});
-
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  }
+);
 
 // #############################
 //  About us Section

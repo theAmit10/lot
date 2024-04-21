@@ -23,8 +23,8 @@ export const sendEmail = async (subject, to, text) => {
     const transporter = createTransport({
         service: 'gmail',
         auth: {
-            user: 'amit.dwsit@gmail.com',
-            pass: 'android@123',
+            user: 'prasadak66@gmail.com',
+            pass: 'uuey bzow yzqr qrcm',
         },
     });
 
