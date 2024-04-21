@@ -18,7 +18,9 @@ export const getAllResult = asyncError(async (req, res, next) => {
   const results = await Result.find({})
     .populate("lotdate")
     .populate("lottime")
-    .populate("lotlocation");
+    .populate("lotlocation")
+    .sort({ createdAt: -1 });
+    
 
   res.status(200).json({
     success: true,
@@ -33,7 +35,8 @@ export const getAllResultAccordingToLocation = asyncError(
     let results = await Result.find({})
       .populate("lotdate")
       .populate("lottime")
-      .populate("lotlocation");
+      .populate("lotlocation")
+      .sort({ createdAt: -1 });
 
 
     if (locationid) {
@@ -177,8 +180,6 @@ console.log("Final result length:", results.length);
     });
   }
 );
-
-
 
 
 
@@ -455,7 +456,7 @@ export const addLotLocatin = asyncError(async (req, res, next) => {
 });
 
 export const getAllLotLocation = asyncError(async (req, res, next) => {
-  const lotlocations = await LotLocation.find({});
+  const lotlocations = await LotLocation.find({}).sort({ createdAt: -1 });
   res.status(200).json({
     success: true,
     lotlocations,

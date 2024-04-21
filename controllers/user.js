@@ -4,10 +4,10 @@ import { Promotion } from "../models/promotion.js";
 // import { Promotion } from "../models/promotion.js";
 import { User } from "../models/user.js";
 import ErrorHandler from "../utils/error.js";
-import { getDataUri, sendToken } from "../utils/features.js";
+import { getDataUri, sendEmail, sendToken } from "../utils/features.js";
 import mongoose from "mongoose";
-import fs from 'fs';
-import pathModule from 'path';
+import fs from "fs";
+import pathModule from "path";
 import { WalletOne } from "../models/walletone.js";
 import { WalletTwo } from "../models/wallettwo.js";
 
@@ -117,7 +117,6 @@ export const getUserDetails = asyncError(async (req, res, next) => {
     user,
   });
 });
-
 
 // Update Wallet One
 export const updateWalletOne = asyncError(async (req, res, next) => {
@@ -273,6 +272,18 @@ export const forgetPassword = asyncError(async (req, res, next) => {
   // After Saving the otp we have to send a email
   // sendEmail()
 
+  const message = `Your OTP For Reseting Password is ${otp}.\nPlease ignore if you haven't requested this`
+
+  try {
+    await sendEmail("OTP for resetting password",user.email,message);
+  } catch (error) {
+    user.otp = null;
+    user.otp_expire = null;
+
+    await user.save();
+    return next(error)
+  }
+
   res.status(200).json({
     success: true,
     message: `Verification code has been sent to ${user.email}`,
@@ -296,7 +307,6 @@ export const resetPassword = asyncError(async (req, res, next) => {
 //   // Using this We can access the file
 //   // req.file
 
- 
 //   // if (user.avatar.url) {
 //   //   // Construct the path to the previous image
 //   //   // const previousImagePath = pathModule.join(__dirname, '..', 'public', 'uploads', user.avatar.url);
@@ -311,7 +321,6 @@ export const resetPassword = asyncError(async (req, res, next) => {
 
 //   const file = getDataUri(req.file);
 
-
 //   user.avatar = {
 //     public_id: req.user._id,
 //     url: filename,
@@ -324,7 +333,6 @@ export const resetPassword = asyncError(async (req, res, next) => {
 //     message: "Profile Pic Updated Successfully",
 //   });
 // });
-
 
 // For uploading profile pic
 // export const updateProfilePic = asyncError(async (req, res, next) => {
@@ -369,9 +377,6 @@ export const resetPassword = asyncError(async (req, res, next) => {
 //   });
 // });
 
-
-
-
 // For uploading profile pic
 export const updateProfilePic = asyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id);
@@ -392,7 +397,13 @@ export const updateProfilePic = asyncError(async (req, res, next) => {
   // If user already has an avatar, delete the previous image
   if (user.avatar && user.avatar.url) {
     // Construct the path to the previous image
-    const previousImagePath = pathModule.join(currentDir, '..', 'public', 'uploads', user.avatar.url);
+    const previousImagePath = pathModule.join(
+      currentDir,
+      "..",
+      "public",
+      "uploads",
+      user.avatar.url
+    );
     try {
       // Delete the previous image from the server
       fs.unlinkSync(previousImagePath);
@@ -417,7 +428,6 @@ export const updateProfilePic = asyncError(async (req, res, next) => {
     message: "Profile Pic Updated Successfully",
   });
 });
-
 
 // For uploading profile pic
 export const getProfilePic = asyncError(async (req, res, next) => {
@@ -566,52 +576,51 @@ export const updatePromotion = asyncError(async (req, res, next) => {
 });
 
 export const updateAnyUserUserId = asyncError(async (req, res, next) => {
- 
   try {
     const userId = req.params.userId;
     const newUserId = req.body.newUserId;
 
     if (!userId) {
-      return res.status(400).json({ success: false, message: 'Invalid user id' });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user id" });
     }
 
     if (!newUserId) {
-      return res.status(400).json({ success: false, message: 'New userid missing' });
+      return res
+        .status(400)
+        .json({ success: false, message: "New userid missing" });
     }
-
 
     // Check if the new userId is unique and not used by any other user
     const existingUser = await User.findOne({ userId: newUserId });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: 'New userId is already taken.' });
+      return res
+        .status(400)
+        .json({ success: false, message: "New userId is already taken." });
     }
 
     // Find the user by the provided userId
     const user = await User.findOne({ userId: userId });
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found.' });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found." });
     }
 
     // Update the userId of the user
     user.userId = newUserId;
     await user.save();
 
-    return res.status(200).json({ success: true, message: 'User userId updated successfully.' });
+    return res
+      .status(200)
+      .json({ success: true, message: "User userId updated successfully." });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, message: 'Internal Server Error' });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal Server Error" });
   }
-  
-
- 
-
-
-
-  
-
- 
-
-
 });
 
 // For Admin
@@ -621,13 +630,33 @@ export const updateAnyUserUserId = asyncError(async (req, res, next) => {
 // ####################
 
 export const getAllUser = asyncError(async (req, res, next) => {
-  const users = await User.find({}).populate("walletOne").populate("walletTwo");
+  const users = await User.find({}).populate("walletOne").populate("walletTwo").sort({ createdAt: -1 });;
 
   res.status(200).json({
     success: true,
     users,
   });
 });
+
+// All user who have register in last 24 hour
+
+export const  getAllUserRegisterInLastOneDay = asyncError(async (req, res, next) => {
+  // Get the current date and time in UTC
+  const currentDate = new Date();
+  const currentUTCDate = new Date(currentDate.toISOString());
+
+  // Subtract 24 hours from the current date to get the date/time 24 hours ago
+  const twentyFourHoursAgo = new Date(currentUTCDate.getTime() - (24 * 60 * 60 * 1000));
+
+  // Find users created within the last 24 hours
+  const users = await User.find({ createdAt: { $gte: twentyFourHoursAgo } }).populate("walletOne").populate("walletTwo");
+
+  res.status(200).json({
+    success: true,
+    users,
+  });
+});
+
 
 // #############################
 //  About us Section
@@ -651,7 +680,6 @@ export const updateAbout = asyncError(async (req, res, next) => {
     success: true,
     message: "Updated Successfully",
   });
-  
 });
 
 // Create Abuut app content
@@ -696,8 +724,7 @@ export const getAllAbout = asyncError(async (req, res, next) => {
   });
 });
 
-
-// Get All WalletOne 
+// Get All WalletOne
 export const getAllWalletOne = asyncError(async (req, res, next) => {
   const wallets = await WalletOne.find({});
 
@@ -726,11 +753,10 @@ export const updateAllWalletNameOne = asyncError(async (req, res, next) => {
   await WalletOne.updateMany({}, { $set: { walletName: walletName } });
 
   res.status(200).json({
-      success: true,
-      message: 'Wallet names updated successfully in all data.',
+    success: true,
+    message: "Wallet names updated successfully in all data.",
   });
 });
-
 
 // Update Wallet name
 // Controller function to update wallet names in all data
@@ -741,7 +767,7 @@ export const updateAllWalletNameTwo = asyncError(async (req, res, next) => {
   await WalletTwo.updateMany({}, { $set: { walletName: walletName } });
 
   res.status(200).json({
-      success: true,
-      message: 'Wallet names updated successfully in all data.',
+    success: true,
+    message: "Wallet names updated successfully in all data.",
   });
 });

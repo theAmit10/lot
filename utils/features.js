@@ -19,9 +19,16 @@ export const getDataUri  = (file) => {}
 // for sending email
 export const sendEmail = async (subject, to, text) => {
 
-    const transpoter = createTransport({});
+    // const transpoter = createTransport({});
+    const transporter = createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'amit.dwsit@gmail.com',
+            pass: 'android@123',
+        },
+    });
 
-    await transpoter.sendMail({
+    await transporter.sendMail({
         to,
         subject,
         text,

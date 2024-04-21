@@ -40,7 +40,11 @@ const schema = new mongoose.Schema({
   },
   otp: Number,
   otp_expire: Date,
-  userId: Number
+  userId: Number,
+  createdAt:{
+    type: Date,
+    default: Date.now(),
+}
 });
 
 

@@ -1,5 +1,5 @@
 import express from "express"
-import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion, createAbout, getAllAbout, deleteAbout, updateAbout, getAllWalletOne, getAllWalletTwo, updateAllWalletNameOne, updateAllWalletNameTwo, updateWalletOne, updateWalletTwo, updateAnyUserUserId, } from "../controllers/user.js";
+import { changePassword, forgetPassword, getAllUser, getMyProfile, getUserDetails, login, logout, register, resetPassword, updatePic, updateProfile, updateProfilePic,getProfilePic, getAllPromotions, addPromotion, deletePromotion, updatePromotion, createAbout, getAllAbout, deleteAbout, updateAbout, getAllWalletOne, getAllWalletTwo, updateAllWalletNameOne, updateAllWalletNameTwo, updateWalletOne, updateWalletTwo, updateAnyUserUserId, getAllUserRegisterInLastOneDay, } from "../controllers/user.js";
 import { isAuthenticated, verifyToken } from "../middlewares/auth.js";
 import { singleUpload } from "../middlewares/multer.js";
 import { singleUploadForPromotion } from "../middlewares/promotionmiddlerware.js";
@@ -20,6 +20,8 @@ router.get("/allwalletone",isAuthenticated,getAllWalletOne);
 router.get("/allwallettwo",isAuthenticated,getAllWalletTwo);
 router.put("/updatewalletone",isAuthenticated,updateAllWalletNameOne);
 router.put("/updatewallettwo",isAuthenticated,updateAllWalletNameTwo);
+
+router.get("/alluserlastday",getAllUserRegisterInLastOneDay);
 
 
 // All Routes regarding update
@@ -52,6 +54,8 @@ router.post("/createabout",createAbout);
 router.get("/getallabout",getAllAbout);
 router.delete("/removeabout/:id",isAuthenticated,deleteAbout);
 router.put("/updateabout/:id",isAuthenticated,updateAbout)
+
+
 
 export default router;
 
