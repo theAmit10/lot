@@ -18,6 +18,8 @@ export const login = asyncError(async (req, res, next) => {
   if (!email) return next(new ErrorHandler("Please enter email", 400));
 
   const user = await User.findOne({ email }).select("+password");
+
+  if (!user) return next(new ErrorHandler("Not Registered", 400));
   // console.log(password)
   // console.log(user)
 
