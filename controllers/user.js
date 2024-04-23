@@ -642,11 +642,15 @@ export const updateAnyUserUserId = asyncError(async (req, res, next) => {
   }
 });
 
+
 // For Admin
 
 // ####################
 // ALL USER
 // ####################
+
+
+
 
 export const getAllUser = asyncError(async (req, res, next) => {
   const users = await User.find({})
