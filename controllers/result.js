@@ -192,7 +192,8 @@ export const getAllResultAccordingToDateTimeLocation = asyncError(
         .populate("lotdate")
         .populate("lottime")
         .populate("lotlocation")
-        .exec();
+        .exec()
+        .sort({ createdAt: -1 });
 
       if (lotdateId && lottimeId && lotlocationId) {
         // Filter results array based on all three parameters
@@ -296,7 +297,7 @@ export const addLotDate = asyncError(async (req, res, next) => {
 });
 
 export const getAllLotDate = asyncError(async (req, res, next) => {
-  const lotdates = await LotDate.find({}).populate("lottime");
+  const lotdates = await LotDate.find({}).populate("lottime").sort({ createdAt: -1 });
   res.status(200).json({
     success: true,
     lotdates,
@@ -307,7 +308,7 @@ export const getAllLotDateAccordindLocationAndTime = asyncError(
   async (req, res, next) => {
     const { lottimeId, lotlocationId } = req.query;
 
-    let lotdates = await LotDate.find({}).populate("lottime");
+    let lotdates = await LotDate.find({}).populate("lottime").sort({ createdAt: -1 });
 
     if (lottimeId && lotlocationId) {
       // Filter lotdates array based on both lottimeId and lotlocationId
@@ -387,7 +388,7 @@ export const addLotTime = asyncError(async (req, res, next) => {
 });
 
 export const getAllLotTime = asyncError(async (req, res, next) => {
-  const lottimes = await LotTime.find({}).populate("lotlocation");
+  const lottimes = await LotTime.find({}).populate("lotlocation").sort({ createdAt: -1 });
   res.status(200).json({
     success: true,
     lottimes,
@@ -398,7 +399,7 @@ export const getAllLotTimeAccordindLocation = asyncError(
   async (req, res, next) => {
     const { locationid } = req.query;
 
-    let lottimes = await LotTime.find({}).populate("lotlocation");
+    let lottimes = await LotTime.find({}).populate("lotlocation").sort({ createdAt: -1 });
 
     if (locationid) {
       // Filter lottimes array based on locationid
