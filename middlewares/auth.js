@@ -12,7 +12,8 @@ export const isAuthenticated = asyncError(async (req, res, next) => {
   const token = bearer[1];
   req.token = token;
   const decodedData = jwt.verify(req.token, process.env.JWT_SECRET);
-  console.log("USer :: " + decodedData._id);
+  console.log("User :: " + decodedData._id);
+  console.log("User Deata :: " + JSON.stringify(decodedData));
 
   req.user = await User.findById(decodedData._id);
 

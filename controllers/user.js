@@ -199,7 +199,13 @@ export const updateProfile = asyncError(async (req, res, next) => {
   const { name, email } = req.body;
 
   if (name) user.name = name;
-  if (email) user.email = email;
+  // if (email) user.email = email;
+
+  if (email) {
+    let old_user = await User.findOne({ email });
+    if (old_user) return next(new ErrorHandler("User Already exist", 400));
+    user.email = email;
+  }
 
   await user.save();
 
@@ -644,15 +650,11 @@ export const updateAnyUserUserId = asyncError(async (req, res, next) => {
   }
 });
 
-
 // For Admin
 
 // ####################
 // ALL USER
 // ####################
-
-
-
 
 export const getAllUser = asyncError(async (req, res, next) => {
   const users = await User.find({})
