@@ -207,6 +207,8 @@ export const getAllResultAccordingToDateTimeLocation = asyncError(
         );
       }
 
+      
+
       res.status(200).json({
         success: true,
         results,
@@ -219,6 +221,9 @@ export const getAllResultAccordingToDateTimeLocation = asyncError(
     }
   }
 );
+
+
+
 
 export const getResultDetails = asyncError(async (req, res, next) => {
   const result = await Result.findById(req.params.id);
@@ -303,11 +308,47 @@ export const getAllLotDate = asyncError(async (req, res, next) => {
   });
 });
 
+// export const getAllLotDateAccordindLocationAndTime = asyncError(
+//   async (req, res, next) => {
+//     const { lottimeId, lotlocationId } = req.query;
+
+//     let lotdates = await LotDate.find({}).populate("lottime").sort({ createdAt: -1 });
+
+//     if (lottimeId && lotlocationId) {
+//       // Filter lotdates array based on both lottimeId and lotlocationId
+//       lotdates = lotdates.filter(
+//         (item) =>
+//           item.lottime._id.toString() === lottimeId &&
+//           item.lottime.lotlocation.toString() === lotlocationId
+//       );
+//     } else if (lottimeId) {
+//       // Filter lotdates array based on lottimeId
+//       lotdates = lotdates.filter(
+//         (item) => item.lottime._id.toString() === lottimeId
+//       );
+//     } else if (lotlocationId) {
+//       // Filter lotdates array based on lotlocationId
+//       lotdates = lotdates.filter(
+//         (item) => item.lottime.lotlocation.toString() === lotlocationId
+//       );
+//     }
+
+   
+
+//     res.status(200).json({
+//       success: true,
+//       lotdates,
+//     });
+//   }
+// );
+
 export const getAllLotDateAccordindLocationAndTime = asyncError(
   async (req, res, next) => {
     const { lottimeId, lotlocationId } = req.query;
 
-    let lotdates = await LotDate.find({}).populate("lottime").sort({ createdAt: -1 });
+    let lotdates = await LotDate.find({})
+      .populate("lottime")
+      .sort({ "lottime.lotdate": -1 }); // Sort based on lotdate in descending order
 
     if (lottimeId && lotlocationId) {
       // Filter lotdates array based on both lottimeId and lotlocationId
@@ -334,6 +375,7 @@ export const getAllLotDateAccordindLocationAndTime = asyncError(
     });
   }
 );
+
 
 export const deleteLotDate = asyncError(async (req, res, next) => {
   const lotdate = await LotDate.findById(req.params.id);
