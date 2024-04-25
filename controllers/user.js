@@ -196,7 +196,7 @@ export const logout = asyncError(async (req, res, next) => {
 export const updateProfile = asyncError(async (req, res, next) => {
   const user = await User.findById(req.user._id);
 
-  const { name, email } = req.body;
+  const { name, email, contact } = req.body;
 
   if (name) user.name = name;
   // if (email) user.email = email;
@@ -205,6 +205,12 @@ export const updateProfile = asyncError(async (req, res, next) => {
     let old_user = await User.findOne({ email });
     if (old_user) return next(new ErrorHandler("User Already exist", 400));
     user.email = email;
+  }
+
+  if (contact) {
+    let old_user = await User.findOne({ contact });
+    if (old_user) return next(new ErrorHandler("Contact Already exist", 400));
+    user.contact = contact;
   }
 
   await user.save();

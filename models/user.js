@@ -16,6 +16,10 @@ const schema = new mongoose.Schema({
     required: [true, "Please enter email"],
     unique: [true, "user already exists"],
   },
+  contact: {
+    type: String,
+    unique: [true, "contact already exists"],
+  },
   password: {
     type: String,
     required: [true, "Please enter password"],
