@@ -520,6 +520,8 @@ export const addPromotion = asyncError(async (req, res, next) => {
 
   // const uniqueFilename = `${Date.now()}${filename}`;
 
+
+
   // Assuming you want to save public_id and url of the image in the database
   const promotionData = {
     url: filename,
